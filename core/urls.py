@@ -18,10 +18,13 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+
+    # URL de l'API pour les événements
+    path('api/event/', include('event.urls'))
 ]
 
 # Ajout des URL statiques uniquement en mode DEBUG
