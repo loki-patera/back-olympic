@@ -60,6 +60,10 @@ Pour une installation en local via le terminal de commande, suivre les étapes s
       POSTGRES_PASSWORD=              # Mot de passe de l'utilisateur de la base de données
       POSTGRES_HOST=127.0.0.1
       POSTGRES_PORT=                  # Port utilisé pour se connecter à la base de données
+
+      CORS_ALLOWED_ORIGINS=http://127.0.0.1:3000,http://127.0.0.1:8000
+
+      WEBSITE_URL=http://127.0.0.1:8000
       ```
 
   9. Préparer les migrations (commande Windows) :
