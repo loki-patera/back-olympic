@@ -20,3 +20,12 @@ class Sport(models.Model):
       str : Le nom de l'épreuve sportive.
     """
     return self.title
+  
+  def image_url(self) -> str:
+
+    """
+    Retourne l'URL complète pour l'image associée au sport.
+    Returns:
+      str: L'URL complète de l'image, combinant l'URL de base du site web et l'URL relative de l'image.
+    """
+    return f'{settings.WEBSITE_URL}{self.image.url}'
