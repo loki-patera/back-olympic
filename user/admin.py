@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib import admin
 from .models import Person, User
 
 admin.site.site_header = "Administration de la billetterie des Jeux olympiques"
+admin.site.site_url = settings.SITE_URL
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):

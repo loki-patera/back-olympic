@@ -21,7 +21,8 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    # URL de l'interface l'administration moins évidente pour plus de sécurité
+    path("co-entity/", admin.site.urls),
 
     # URL de l'API pour les événements
     path('api/event/', include('event.urls'))

@@ -153,5 +153,6 @@ REST_FRAMEWORK = {
   ]
 }
 
-# Website URL
+# Urls
 WEBSITE_URL = os.environ.get("WEBSITE_URL")
+SITE_URL = os.environ.get("SITE_URL")
