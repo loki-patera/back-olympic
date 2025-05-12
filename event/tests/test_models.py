@@ -14,7 +14,6 @@ class SportModelTests(TestCase):
       image="sports/surf.jpg"
     )
 
-
   def test_sport_str_representation(self):
 
     """
@@ -22,17 +21,6 @@ class SportModelTests(TestCase):
     - La méthode `__str__` du modèle `Sport` retourne la bonne représentation en chaîne.
     """
     self.assertEqual(str(self.sport), "Surf")
-  
-
-  def test_image_url(self):
-
-    """
-    Teste la méthode `image_url` du modèle `Sport` en vérifiant que :
-    - L'URL complète de l'image est correctement générée en combinant `settings.WEBSITE_URL` et `self.image.url`.
-    """
-    with self.settings(WEBSITE_URL="http://example.com"):
-      expected_url = "http://example.com/media/sports/surf.jpg"
-      self.assertEqual(self.sport.image_url(), expected_url)
 
 
 
@@ -70,7 +58,7 @@ class EventModelTests(TestCase):
     """
     self.sport = Sport.objects.create(
       title="Natation artistique",
-      image="images/sports/natation-artistique.jpg"
+      image="sports/natation-artistique.jpg"
     )
     self.location = Location.objects.create(
       name="Centre aquatique olympique",
@@ -83,7 +71,7 @@ class EventModelTests(TestCase):
       date=date(2024, 8, 5),
       start_time=time(10, 0),
       end_time=time(12, 0),
-      price=50.00
+      price="50.00"
     )
 
   def test_event_str_representation(self):
@@ -115,7 +103,7 @@ class CompetitionModelTests(TestCase):
     """
     self.sport = Sport.objects.create(
       title="Athlétisme",
-      image="images/sports/athletisme.jpg"
+      image="sports/athletisme.jpg"
     )
     self.location = Location.objects.create(
       name="Stade de France",
@@ -128,7 +116,7 @@ class CompetitionModelTests(TestCase):
       date=date(2024, 7, 28),
       start_time=time(15, 0),
       end_time=time(17, 0),
-      price=250.00
+      price="250.00"
     )
     self.competition = Competition.objects.create(
       description="100 m",

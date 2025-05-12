@@ -1,4 +1,4 @@
-from django.conf import settings
+from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -32,16 +32,7 @@ class Sport(models.Model):
     Returns:
       str : Le nom de l'épreuve sportive.
     """
-    return self.title
-  
-  def image_url(self) -> str:
-
-    """
-    Retourne l'URL complète pour l'image associée au sport.
-    Returns:
-      str: L'URL complète de l'image, combinant l'URL de base du site web et l'URL relative de l'image.
-    """
-    return f'{settings.WEBSITE_URL}{self.image.url}'
+    return self.title 
 
 
 
@@ -120,7 +111,7 @@ class Event(models.Model):
     decimal_places=2,
     max_digits=5,
     null=False,
-    validators=[MinValueValidator(0), MaxValueValidator(999.99)],
+    validators=[MinValueValidator(0), MaxValueValidator(Decimal(999.99))],
     verbose_name="Prix (€)"
   )
   
