@@ -17,15 +17,15 @@ class SportListAPITest(TestCase):
     # Crée des exemples de sports dans la base de données pour les tests
     Sport.objects.create(
       title="Football",
-      image="images/sports/football.jpg"
+      image="sports/football.jpg"
     )
     Sport.objects.create(
       title="Basketball",
-      image="images/sports/basketball.jpg"
+      image="sports/basketball.jpg"
     )
     Sport.objects.create(
       title="Tennis",
-      image="images/sports/tennis.jpg"
+      image="sports/tennis.jpg"
     )
 
 
@@ -54,8 +54,7 @@ class SportListAPITest(TestCase):
   def test_sport_list_empty(self):
 
     """
-    Teste que le point de terminaison API `sport_list` retourne une liste vide lorsqu'il n'y a aucun sport dans la base
-    de données.
+    Teste que le point de terminaison API `sport_list` retourne une liste vide lorsqu'il n'y a aucun sport dans la base de données.
     """
     # Supprime tous les sports existants dans la base de données
     Sport.objects.all().delete()
