@@ -25,7 +25,7 @@ urlpatterns = [
     path("co-entity/", admin.site.urls),
 
     # URL de l'API pour les événements
-    path('api/event/', include('event.urls'))
+    path('event/', include('event.urls'))
 ]
 
 # Ajout des URL statiques uniquement en mode DEBUG

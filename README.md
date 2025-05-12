@@ -61,9 +61,9 @@ Pour une installation en local via le terminal de commande, suivre les étapes s
       POSTGRES_HOST=127.0.0.1
       POSTGRES_PORT=                  # Port utilisé pour se connecter à la base de données
 
-      CORS_ALLOWED_ORIGINS=http://127.0.0.1:3000,http://127.0.0.1:8000
+      CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:8000
 
-      WEBSITE_URL=http://127.0.0.1:8000
+      WEBSITE_URL=http://localhost:3000
       ```
 
   9. Préparer les migrations (commande Windows) :
@@ -112,7 +112,7 @@ Pour utiliser l'application en local, suivre les étapes suivantes :
       py manage.py runserver
       ```
   
-  2. Ouvrir le serveur à l'adresse [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin)
+  2. Ouvrir le serveur à l'adresse [http://127.0.0.1:8000/co-entity](http://127.0.0.1:8000/co-entity)
 
   3. Entrer l'email et le mot de passe que vous avez créer précédemment pour le super utilisateur afin d'accéder à
   l'interface d'administration
