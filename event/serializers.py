@@ -12,6 +12,12 @@ class SportSerializer(serializers.ModelSerializer):
     )
 
 
+class SportLightSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Sport
+    fields = (
+      'title',
+    )
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -26,6 +32,13 @@ class LocationSerializer(serializers.ModelSerializer):
     )
 
 
+class LocationLightSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Location
+    fields = (
+      'name',
+      'city'
+    )
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -47,6 +60,21 @@ class EventSerializer(serializers.ModelSerializer):
     )
 
 
+class EventLightSerializer(serializers.ModelSerializer):
+  sport = SportLightSerializer()
+  location = LocationLightSerializer()
+
+  class Meta:
+    model = Event
+    fields = (
+      'id_event',
+      'sport',
+      'location',
+      'date',
+      'start_time',
+      'end_time',
+      'price'
+    )
 
 
 class CompetitionSerializer(serializers.ModelSerializer):
