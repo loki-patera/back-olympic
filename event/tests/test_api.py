@@ -3,6 +3,8 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 from event.models import Competition, Event, Location, Sport
+from offer.models import Offer
+from offer.serializers import OfferSerializer
 
 class SportListAPITest(TestCase):
 
@@ -145,7 +147,6 @@ class EventListAPITest(TestCase):
 
 class CompetitionListByEventAPITest(TestCase):
 
-
   def setUp(self):
     
     """
@@ -210,3 +211,125 @@ class CompetitionListByEventAPITest(TestCase):
     # Vérifie que les détails des compétitions sont corrects
     self.assertEqual(data[0]['description'], "Match 1")
     self.assertEqual(data[1]['description'], "Match 2")
+
+
+
+
+class CartDetailsAPITest(TestCase):
+
+  def setUp(self):
+
+    """
+    Configure le client API et crée des événements et des offres d'exemple pour les tests.
+    """
+    # Crée un client API pour effectuer des requêtes sur les points de terminaison de l'API
+    self.client = APIClient()
+
+    # Crée des exemples de sports, de lieux, d'événements et d'offres
+    self.sport = Sport.objects.create(
+      title="Natation",
+      image="sports/natation.jpg"
+    )
+    self.location = Location.objects.create(
+      name="Piscine Olympique",
+      city="Marseille",
+      total_seats=10000
+    )
+    self.event = Event.objects.create(
+      sport=self.sport,
+      location=self.location,
+      date="2025-08-01",
+      start_time="10:00:00",
+      end_time="12:00:00",
+      price="30.00"
+    )
+    self.offer = Offer.objects.create(
+      type="Offre Solo",
+      number_seats=1,
+      discount=2
+    )
+
+  def test_cart_details_success(self):
+
+    """
+    Teste que le point de terminaison API `cart_details` retourne un code de statut 200 et les détails corrects des événements et des offres.
+    """
+    # Vérifie que le nom de l'URL correspond à la configuration d'URL
+    url = reverse('cart_details')
+
+    #  Crée une liste de données de réservation avec les ID d'événement et d'offre
+    payload = [{
+      "id_event": self.event.id_event,
+      "id_offer": self.offer.id_offer
+    }]
+
+    # Effectue une requête POST sur l'URL avec les données de la réservation
+    response = self.client.post(url, payload, format='json')
+
+    # Vérifie que le code de statut de la réponse est 200 (OK)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    data = response.json()
+    # Vérifie que la liste des détails pour le panier contient le bon nombre d'éléments
+    self.assertEqual(len(data), 1)
+    # Vérifie que les détails des événements et des offres sont corrects
+    self.assertEqual(data[0]['event']['id_event'], self.event.id_event)
+    self.assertEqual(data[0]['event']['sport']['title'], self.sport.title)
+    self.assertEqual(data[0]['event']['location']['name'], self.location.name)
+    self.assertEqual(data[0]['event']['location']['city'], self.location.city)
+    self.assertEqual(data[0]['event']['date'], "2025-08-01")
+    self.assertEqual(data[0]['event']['start_time'], "10:00:00")
+    self.assertEqual(data[0]['event']['end_time'], "12:00:00")
+    self.assertEqual(data[0]['event']['price'], "30.00")
+
+    self.assertEqual(data[0]['offer']['id_offer'], self.offer.id_offer)
+    self.assertEqual(data[0]['offer']['type'], "Offre Solo")
+    self.assertEqual(data[0]['offer']['number_seats'], 1)
+    self.assertEqual(data[0]['offer']['discount'], 2)
+
+  def test_cart_details_invalid_ids(self):
+
+    """
+    Teste que le point de terminaison API `cart_details` retourne un code de statut 200 et une liste vide lorsque les ID d'événement et d'offre sont
+    invalides.
+    """
+    # Vérifie que le nom de l'URL correspond à la configuration d'URL
+    url = reverse('cart_details')
+
+    # Crée une liste de données de réservation avec des ID d'événement et d'offre invalides
+    payload = [{
+      "id_event": 9999,
+      "id_offer": 8888
+    }]
+
+    # Effectue une requête POST sur l'URL avec les données de la réservation
+    response = self.client.post(url, payload, format='json')
+
+    # Vérifie que le code de statut de la réponse est 200 (OK)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    data = response.json()
+    # Vérifie que la liste des détails pour le panier est vide
+    self.assertEqual(data, [])
+
+  def test_cart_details_empty_payload(self):
+
+    """
+    Teste que le point de terminaison API `cart_details` retourne un code de statut 200 et une liste vide lorsque les ID d'événement et d'offre ne
+    sont pas fournis.
+    """
+    # Vérifie que le nom de l'URL correspond à la configuration d'URL
+    url = reverse('cart_details')
+
+    # Crée une liste de données de réservation vide
+    payload = []
+
+    # Effectue une requête POST sur l'URL sans données de réservation
+    response = self.client.post(url, payload, format='json')
+
+    # Vérifie que le code de statut de la réponse est 200 (OK)
+    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    data = response.json()
+    # Vérifie que la liste des détails pour le panier est vide
+    self.assertEqual(data, [])
