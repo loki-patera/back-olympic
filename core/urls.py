@@ -28,7 +28,10 @@ urlpatterns = [
     path('event/', include('event.urls')),
 
     # URL de l'API pour les offres
-    path('offer/', include('offer.urls'))
+    path('offer/', include('offer.urls')),
+
+    # URL de l'API pour les utilisateurs
+    path('user/', include('user.urls'))
 ]
 
 # Ajout des URL statiques uniquement en mode DEBUG
