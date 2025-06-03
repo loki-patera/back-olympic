@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.request import Request
 from rest_framework.response import Response
 from .models import Competition, Event, Sport
 from .serializers import CompetitionSerializer, EventLightSerializer, EventSerializer, SportSerializer
@@ -9,7 +10,7 @@ from offer.serializers import OfferSerializer
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-def sport_list(request) -> Response:
+def sport_list(request: Request) -> Response:
 
   """
   Récupère une liste de toutes les épreuves sportives.
@@ -27,7 +28,7 @@ def sport_list(request) -> Response:
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-def event_list(request) -> Response:
+def event_list(request: Request) -> Response:
 
   """
   Récupère une liste de tous les événements sportifs.
@@ -46,7 +47,7 @@ def event_list(request) -> Response:
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-def competition_list_by_event(request, event_id: int) -> Response:
+def competition_list_by_event(request: Request, event_id: int) -> Response:
 
   """
   Récupère une liste de toutes les compétitions associées à un événement sportif spécifique.
@@ -65,7 +66,7 @@ def competition_list_by_event(request, event_id: int) -> Response:
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def cart_details(request) -> Response:
+def cart_details(request: Request) -> Response:
 
   """
   Récupère les détails des événements et des offres associés à une liste d'articles dans le panier.
