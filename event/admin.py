@@ -75,12 +75,12 @@ class EventAdmin(admin.ModelAdmin):
       f'<span style="color: {color}; font-weight: bold;">{obj.available_seats}</span>'
     )
   
-  def location_name(self, obj) -> str:
+  def location_name(self, obj: Event) -> str:
 
     """
     Retourne le nom du lieu associé à l'événement.
     Args:
-      obj: Un objet qui doit avoir un attribut `location` avec un attribut `name`.
+      obj (Event): L'instance de l'événement dont on veut obtenir le nom du lieu.
     Returns:
       str: Le nom du lieu associé à l'événement.
     """

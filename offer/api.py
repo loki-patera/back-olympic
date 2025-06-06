@@ -1,5 +1,6 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.request import Request
 from rest_framework.response import Response
 from .models import Offer
 from .serializers import OfferSerializer, SeatSerializer
@@ -7,7 +8,7 @@ from .serializers import OfferSerializer, SeatSerializer
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-def number_seats_list(request):
+def number_seats_list(request: Request) -> Response:
     
   """
   Récupère la liste des valeurs distinctes du nombre de places des offres.
@@ -27,7 +28,7 @@ def number_seats_list(request):
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-def offer_list(request):
+def offer_list(request: Request) -> Response:
     
   """
   Récupère la liste de toutes les offres.
