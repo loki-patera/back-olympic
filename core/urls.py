@@ -28,11 +28,14 @@ urlpatterns = [
     path('event/', include('event.urls')),
 
     # URL de l'API pour les offres
-    path('offer/', include('offer.urls'))
+    path('offer/', include('offer.urls')),
+
+    # URL de l'API pour les utilisateurs
+    path('user/', include('user.urls'))
 ]
 
 # Ajout des URL statiques uniquement en mode DEBUG
-if settings.DEBUG:
+if settings.DEBUG:  # pragma: no cover
 
   # Permet de servir les fichiers médias en mode développement
   urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -16,23 +16,32 @@ class PersonAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
   
-  list_display = ("lastname", "firstname", "email")
+  fieldsets = (
+    (None, {
+      "fields": ("email", "account_key")
+    }),
+    ("Informations personnelles", {
+      "fields": ("firstname", "lastname", "date_of_birth", "country")
+    }),
+    ("Permissions", {
+      "fields": ("is_active", "is_staff", "is_superuser")
+    }),
+    ("Informations de connexion", {
+      "fields": ("date_joined", "last_login")
+    })
+  )
+  list_display = ("lastname", "firstname", "email", "account_key")
   ordering = ("lastname", "firstname")
 
-  def get_exclude(self, request, obj=None) -> (list | list[str]):
-
-    """
-    Détermine la liste des champs à exclure de l'interface d'administration selon les permissions de l'utilisateur.
-    Args:
-      request (HttpRequest): L'objet de requête HTTP contenant des informations sur l'utilisateur actuel et le contexte
-        de la requête.
-      obj (Model, optionnel): L'instance du modèle en cours d'édition. Par défaut, None.
-    Returns:
-      list: Une liste des noms de champs à exclure. Retourne une liste vide si l'utilisateur est un superutilisateur;
-        sinon, exclut "groups", "password" et "user_permissions".
-    """
-
-    if request.user.is_superuser:
-      return []
+  def account_key(self, obj: User) -> str:
     
-    return ["groups", "password", "user_permissions"]
+    """
+    Retourne la clé du compte de l'utilisateur.
+    Args:
+      obj (User): L'instance de l'utilisateur dont on veut obtenir la clé du compte.
+    Returns:
+      str: La clé du compte de l'utilisateur.
+    """
+    return obj.id_person
+  
+  account_key.short_description = "Clé de compte"

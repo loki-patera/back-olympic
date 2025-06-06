@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from .models import Sport
 
 @receiver(post_delete, sender=Sport)
-def delete_image_on_object_delete(instance, **kwargs):
+def delete_image_on_object_delete(instance: Sport, **kwargs) -> None:
 
   """
   Supprime le fichier d'image associé à l'instance de `Sport` lorsque l'instance est supprimée.
