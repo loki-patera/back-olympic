@@ -149,9 +149,18 @@ CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS").split(",")
 
 # Rest framework settings
 REST_FRAMEWORK = {
-  "DEFAULT_PERMISSION_CLASSES": [
-    "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
-  ]
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ]
+}
+
+# Simple JWT settings
+SIMPLE_JWT = {
+    "USER_ID_FIELD": "id_person",
+    "USER_ID_CLAIM": "user_id"
 }
 
 # Url
