@@ -1,6 +1,9 @@
 import re
 from datetime import date
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.tokens import Token
 from .models import User
 
 COUNTRIES = [
@@ -34,7 +37,7 @@ COUNTRIES = [
 
 class RegisterUserSerializer(serializers.ModelSerializer):
 
-  email = serializers.EmailField(max_length=100)
+  email = serializers.EmailField(min_length=6, max_length=100)
   password = serializers.CharField(write_only=True, min_length=16, max_length=128)
   firstname = serializers.CharField(min_length=2, max_length=50)
   lastname = serializers.CharField(min_length=2, max_length=50)
@@ -65,16 +68,17 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     Returns:
       str: L'email validé.
     """
+    if len(value) < 6:
+      raise serializers.ValidationError("Email trop court !")
+
     if len(value) > 100:
-      raise serializers.ValidationError("L'email ne doit pas dépasser 100 caractères.")
+      raise serializers.ValidationError("Email trop long !")
     
     if not re.match(r"^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$", value):
-      raise serializers.ValidationError(
-        "L'email doit contenir minimum un caractère avant le '@', un nom de domaine valide, et une extension de domaine valide de 2 caractères minimum."
-      )
+      raise serializers.ValidationError("Format de l'email invalide !")
     
     if User.objects.filter(email=value).exists():
-      raise serializers.ValidationError("Cet email est déjà utilisé.")
+      raise serializers.ValidationError("Cet email est déjà utilisé !")
     
     return value
   
@@ -92,18 +96,16 @@ class RegisterUserSerializer(serializers.ModelSerializer):
       str: Le mot de passe validé.
     """
     if re.search(r'[<>"\'`;\/\\|&()\[\]{}]', value):
-      raise serializers.ValidationError("Des caractères interdits sont présents dans le mot de passe.")
+      raise serializers.ValidationError("Caractères interdits dans le mot de passe !")
     
     if len(value) < 16:
-      raise serializers.ValidationError("Le mot de passe doit contenir au moins 16 caractères.")
+      raise serializers.ValidationError("Mot de passe trop court !")
     
     if len(value) > 128:
-      raise serializers.ValidationError("Le mot de passe ne doit pas dépasser 128 caractères.")
+      raise serializers.ValidationError("Mot de passe trop long !")
     
     if not re.match(r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d])[^\s]{16,128}$", value):
-      raise serializers.ValidationError(
-        "Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial."
-      )
+      raise serializers.ValidationError("Format du mot de passe invalide !")
     
     return value
   
@@ -120,15 +122,13 @@ class RegisterUserSerializer(serializers.ModelSerializer):
       str: Le prénom validé.
     """
     if len(value) < 2:
-      raise serializers.ValidationError("Le prénom doit contenir au moins 2 caractères.")
+      raise serializers.ValidationError("Prénom trop court !")
     
     if len(value) > 50:
-      raise serializers.ValidationError("Le prénom ne doit pas dépasser 50 caractères.")
+      raise serializers.ValidationError("Prénom trop long !")
     
     if not re.match(r"^(?=.{2,50}$)[A-ZÀ-ÖÙ-Ý][a-zà-öù-ÿ]+(?:-[A-ZÀ-ÖÙ-Ý][a-zà-öù-ÿ]+)*$", value):
-      raise serializers.ValidationError(
-        "Le prénom doit commencer par une majuscule et ne contenir que des lettres et/ou des tirets dans les prénoms composés."
-      )
+      raise serializers.ValidationError("Format du prénom invalide !")
     
     return value
   
@@ -145,15 +145,13 @@ class RegisterUserSerializer(serializers.ModelSerializer):
       str: Le nom de famille validé.
     """
     if len(value) < 2:
-      raise serializers.ValidationError("Le nom de famille doit contenir au moins 2 caractères.")
+      raise serializers.ValidationError("Nom de famille trop court !")
     
     if len(value) > 50:
-      raise serializers.ValidationError("Le nom de famille ne doit pas dépasser 50 caractères.")
+      raise serializers.ValidationError("Nom de famille trop long !")
     
     if not re.match(r"^(?=.{2,50}$)[A-ZÀ-ÖÙ-Ý][a-zà-öù-ÿ]+(?:-[A-ZÀ-ÖÙ-Ý][a-zà-öù-ÿ]+)*$", value):
-      raise serializers.ValidationError(
-        "Le nom de famille doit commencer par une majuscule et ne contenir que des lettres et/ou des tirets dans les noms composés."
-      )
+      raise serializers.ValidationError("Format du nom de famille invalide !")
     
     return value
   
@@ -173,10 +171,10 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     min_birth = date(today.year - 18, today.month, today.day)
 
     if value > min_birth:
-      raise serializers.ValidationError("Vous devez avoir au moins 18 ans pour créer un compte.")
+      raise serializers.ValidationError("Vous devez être majeur pour vous inscrire !")
     
     if value < date(1900, 1, 1):
-      raise serializers.ValidationError("Date de naissance trop ancienne.")
+      raise serializers.ValidationError("Date de naissance trop ancienne !")
         
     return value
   
@@ -188,15 +186,15 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     Args:
       value (str): Le pays à valider.
     Raises:
-      serializers.ValidationError: Si le pays est trop long ou ne respecte pas les critères de format.
+      serializers.ValidationError: Si le pays est trop long ou n'est pas dans la liste des pays valides.
     Returns:
       str: Le pays validé.
     """
     if len(value) > 75:
-      raise serializers.ValidationError("Le pays ne doit pas dépasser 75 caractères.")
+      raise serializers.ValidationError("Pays trop long !")
     
     if value not in COUNTRIES:
-      raise serializers.ValidationError("Le pays sélectionné n'est pas valide.")
+      raise serializers.ValidationError("Pays invalide !")
     
     return value
   
@@ -211,3 +209,52 @@ class RegisterUserSerializer(serializers.ModelSerializer):
       User: L'instance de l'utilisateur créé.
     """
     return User.objects.create_user(**validated_data)
+
+
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+
+  @classmethod
+  def get_token(cls, user: User) -> Token:
+
+    """
+    Obtient le token JWT pour l'utilisateur avec des informations supplémentaires.
+
+    Args:
+      user (User): L'utilisateur pour lequel le token est généré.
+    Returns:
+      Token: Le token JWT généré pour l'utilisateur.
+    """
+    return super().get_token(user)
+  
+  def validate(self, attrs: dict) -> dict:
+
+    """
+    Valide les données d'authentification et retourne le token JWT.
+
+    Args:
+      attrs (dict): Les données d'authentification fournies par l'utilisateur.
+    Returns:
+      dict: Le token JWT et les informations de l'utilisateur.
+    """
+    try:
+      # Appel de la méthode parent pour valider les données
+      data = super().validate(attrs)
+    except (serializers.ValidationError, AuthenticationFailed):
+      # Si une erreur de validation se produit, lève une exception avec un message d'erreur personnalisé
+      raise serializers.ValidationError({"detail": "Mot de passe incorrect !"})
+    
+    return data
+
+
+
+
+class UserLightSerializer(serializers.ModelSerializer):
+
+  class Meta:
+    model = User
+    fields = (
+      'firstname',
+      'lastname'
+    )

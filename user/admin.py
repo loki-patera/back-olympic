@@ -32,7 +32,9 @@ class UserAdmin(admin.ModelAdmin):
   )
   list_display = ("lastname", "firstname", "email", "account_key")
   ordering = ("lastname", "firstname")
+  readonly_fields = ("account_key", "date_joined")
 
+  @admin.display(description="Clé de compte")
   def account_key(self, obj: User) -> str:
     
     """
@@ -43,5 +45,3 @@ class UserAdmin(admin.ModelAdmin):
       str: La clé du compte de l'utilisateur.
     """
     return obj.id_person
-  
-  account_key.short_description = "Clé de compte"

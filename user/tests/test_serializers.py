@@ -1,8 +1,9 @@
 from datetime import date
 from django.test import TestCase
-from user.serializers import RegisterUserSerializer
-from user.models import User
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
+from user.serializers import CustomTokenObtainPairSerializer, RegisterUserSerializer
+from user.models import User
 
 class RegisterUserSerializerTests(TestCase):
 
@@ -21,6 +22,16 @@ class RegisterUserSerializerTests(TestCase):
     email = "test@example.com"
     result = self.serializer.validate_email(email)
     assert result == email
+  
+  def test_email_too_short(self):
+
+    """
+    Teste la validation d'une adresse email trop courte.
+    """
+    email = "a@b.c"
+    with self.assertRaises(serializers.ValidationError) as context:
+      self.serializer.validate_email(email)
+    self.assertIn("Email trop court !", str(context.exception))
 
   def test_email_too_long(self):
 
@@ -30,7 +41,7 @@ class RegisterUserSerializerTests(TestCase):
     email = "a" * 101 + "@example.com"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_email(email)
-    self.assertIn("ne doit pas dépasser 100 caractères", str(context.exception))
+    self.assertIn("Email trop long !", str(context.exception))
 
   def test_invalid_email_format(self):
 
@@ -40,7 +51,7 @@ class RegisterUserSerializerTests(TestCase):
     email = "invalid-email"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_email(email)
-    self.assertIn("doit contenir minimum un caractère avant le '@'", str(context.exception))
+    self.assertIn("Format de l'email invalide !", str(context.exception))
 
   def test_email_already_exists(self):
 
@@ -78,7 +89,7 @@ class RegisterUserSerializerTests(TestCase):
     password = "Short1!"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_password(password)
-    self.assertIn("au moins 16 caractères", str(context.exception))
+    self.assertIn("Mot de passe trop court !", str(context.exception))
   
   def test_password_too_long(self):
 
@@ -88,7 +99,7 @@ class RegisterUserSerializerTests(TestCase):
     password = "A" * 129 + "1a!"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_password(password)
-    self.assertIn("ne doit pas dépasser 128 caractères", str(context.exception))
+    self.assertIn("Mot de passe trop long !", str(context.exception))
   
   def test_password_forbidden_characters(self):
 
@@ -98,7 +109,7 @@ class RegisterUserSerializerTests(TestCase):
     password = "MotdepasseValide123<"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_password(password)
-    self.assertIn("caractères interdits", str(context.exception))
+    self.assertIn("Caractères interdits dans le mot de passe !", str(context.exception))
   
   def test_password_missing_complexity(self):
 
@@ -108,7 +119,7 @@ class RegisterUserSerializerTests(TestCase):
     password = "motdepasseenminuscule1234"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_password(password)
-    self.assertIn("au moins une lettre majuscule", str(context.exception))
+    self.assertIn("Format du mot de passe invalide !", str(context.exception))
   
 
   def test_valid_firstname(self):
@@ -128,7 +139,7 @@ class RegisterUserSerializerTests(TestCase):
     firstname = "J"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_firstname(firstname)
-    self.assertIn("au moins 2 caractères", str(context.exception))
+    self.assertIn("Prénom trop court !", str(context.exception))
   
   def test_firstname_too_long(self):
 
@@ -138,7 +149,7 @@ class RegisterUserSerializerTests(TestCase):
     firstname = "J" * 51
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_firstname(firstname)
-    self.assertIn("ne doit pas dépasser 50 caractères", str(context.exception))
+    self.assertIn("Prénom trop long !", str(context.exception))
   
   def test_firstname_invalid_format(self):
 
@@ -148,7 +159,7 @@ class RegisterUserSerializerTests(TestCase):
     firstname = "jean"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_firstname(firstname)
-    self.assertIn("doit commencer par une majuscule", str(context.exception))
+    self.assertIn("Format du prénom invalide !", str(context.exception))
   
   def test_firstname_with_hyphen(self):
       
@@ -177,7 +188,7 @@ class RegisterUserSerializerTests(TestCase):
     lastname = "D"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_lastname(lastname)
-    self.assertIn("au moins 2 caractères", str(context.exception))
+    self.assertIn("Nom de famille trop court !", str(context.exception))
   
   def test_lastname_too_long(self):
 
@@ -187,7 +198,7 @@ class RegisterUserSerializerTests(TestCase):
     lastname = "D" * 51
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_lastname(lastname)
-    self.assertIn("ne doit pas dépasser 50 caractères", str(context.exception))
+    self.assertIn("Nom de famille trop long !", str(context.exception))
   
   def test_lastname_invalid_format(self):
 
@@ -197,7 +208,7 @@ class RegisterUserSerializerTests(TestCase):
     lastname = "dupont"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_lastname(lastname)
-    self.assertIn("doit commencer par une majuscule", str(context.exception))
+    self.assertIn("Format du nom de famille invalide !", str(context.exception))
   
   def test_lastname_with_hyphen(self):
 
@@ -226,7 +237,7 @@ class RegisterUserSerializerTests(TestCase):
     dob = date.today().replace(year=date.today().year - 17)
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_date_of_birth(dob)
-    self.assertIn("au moins 18 ans", str(context.exception))
+    self.assertIn("Vous devez être majeur pour vous inscrire !", str(context.exception))
   
   def test_too_old_date_of_birth(self):
       
@@ -236,7 +247,7 @@ class RegisterUserSerializerTests(TestCase):
     dob = date(1899, 12, 31)
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_date_of_birth(dob)
-    self.assertIn("Date de naissance trop ancienne", str(context.exception))
+    self.assertIn("Date de naissance trop ancienne !", str(context.exception))
   
 
   def test_valid_country(self):
@@ -256,7 +267,7 @@ class RegisterUserSerializerTests(TestCase):
     country = "A" * 76
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_country(country)
-    self.assertIn("ne doit pas dépasser 75 caractères", str(context.exception))
+    self.assertIn("Pays trop long !", str(context.exception))
   
   def test_country_not_in_list(self):
       
@@ -266,7 +277,7 @@ class RegisterUserSerializerTests(TestCase):
     country = "Atlantide"
     with self.assertRaises(serializers.ValidationError) as context:
       self.serializer.validate_country(country)
-    self.assertIn("n'est pas valide", str(context.exception))
+    self.assertIn("Pays invalide !", str(context.exception))
   
 
   def test_create_user_success(self):
@@ -289,3 +300,56 @@ class RegisterUserSerializerTests(TestCase):
     assert str(user.date_of_birth) == data["date_of_birth"]
     assert user.country == data["country"]
     assert user.check_password(data["password"])
+
+
+
+
+class CustomTokenObtainPairSerializerTests(TestCase):
+
+  def setUp(self):
+
+    """
+    Configure les données de test pour le sérialiseur de jeton personnalisé.
+    """
+    self.user = User.objects.create_user(
+      email="tokenuser@example.com",
+      password="MotdepasseValide123!",
+      firstname="Token",
+      lastname="User",
+      date_of_birth="1990-01-01",
+      country="France"
+    )
+
+  def test_get_token_returns_token_instance(self):
+
+    """
+    Teste que la méthode get_token retourne une instance de RefreshToken.
+    """
+    token = CustomTokenObtainPairSerializer.get_token(self.user)
+    self.assertIsInstance(token, RefreshToken)
+  
+  def test_validate_with_valid_credentials(self):
+
+    """
+    Teste la validation avec des identifiants valides.
+    """
+    serializer = CustomTokenObtainPairSerializer(data={
+      "email": "tokenuser@example.com",
+      "password": "MotdepasseValide123!"
+    })
+    self.assertTrue(serializer.is_valid())
+    self.assertIn("access", serializer.validated_data)
+    self.assertIn("refresh", serializer.validated_data)
+
+  def test_validate_with_invalid_password(self):
+
+    """
+    Teste la validation avec un mot de passe incorrect.
+    """
+    serializer = CustomTokenObtainPairSerializer(data={
+      "email": "tokenuser@example.com",
+      "password": "MauvaisMotDePasse123!"
+    })
+    with self.assertRaises(serializers.ValidationError) as context:
+      serializer.is_valid(raise_exception=True)
+    self.assertIn("Mot de passe incorrect", str(context.exception))
