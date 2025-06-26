@@ -38,7 +38,7 @@ def event_list(request: Request) -> Response:
   Returns:
     → Response : Une réponse JSON contenant la liste sérialisée des événements sportifs avec un code de statut HTTP 200.
   """
-  events = Event.objects.select_related('sport', 'location').order_by('date', 'start_time')
+  events = Event.objects.select_related('sport', 'location').order_by('date', 'start_time', 'end_time')
   serializer = EventSerializer(events, many=True)
   
   return Response(serializer.data, status=status.HTTP_200_OK)
@@ -92,5 +92,13 @@ def cart_details(request: Request) -> Response:
       'event': EventLightSerializer(event).data,
       'offer': OfferSerializer(offer).data
     })
+
+    result.sort(
+      key=lambda x: (
+        x['event']['date'],
+        x['event']['start_time'],
+        x['event']['end_time']
+      )
+    )
   
   return Response(result, status=status.HTTP_200_OK)

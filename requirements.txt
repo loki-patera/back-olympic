@@ -1,8 +1,10 @@
-coverage==7.8.2
-Django==5.2.2
+coverage==7.9.1
+Django==5.2.3
 django-cors-headers==4.7.0
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
+numpy==2.3.1
 pillow==11.2.1
 psycopg2-binary==2.9.10
 python-dotenv==1.1.0
+qrcode==8.2

@@ -6,4 +6,4 @@ class OfferAdmin(admin.ModelAdmin):
 
   list_display = ('type', 'number_seats', 'discount')
   list_filter = ('number_seats',)
-  ordering = ('number_seats', 'discount')
+  ordering = ('number_seats', 'discount', 'type')

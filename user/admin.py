@@ -24,7 +24,7 @@ class UserAdmin(admin.ModelAdmin):
       "fields": ("firstname", "lastname", "date_of_birth", "country")
     }),
     ("Permissions", {
-      "fields": ("is_active", "is_staff", "is_superuser")
+      "fields": ("is_active", "is_staff", "is_superuser", "user_permissions")
     }),
     ("Informations de connexion", {
       "fields": ("date_joined", "last_login")
