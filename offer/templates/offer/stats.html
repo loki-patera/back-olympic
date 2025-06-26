@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Statistiques des réservations</title>
+    <style>
+      table { border-collapse: collapse; width: 60%; margin: 2em auto; }
+      th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+      th { background: #f0f0f0; }
+    </style>
+  </head>
+  <body>
+    <h1 style="text-align:center;">Statistiques des réservations par offre</h1>
+    <table>
+      <tr>
+        <th>Offre</th>
+        <th>Nombre de réservations</th>
+      </tr>
+      {% for stat in stats %}
+      <tr>
+        <td>{{ stat.offer }}</td>
+        <td>{{ stat.count }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
