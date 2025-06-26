@@ -5,6 +5,7 @@ from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.html import format_html
 from io import BytesIO
 from PIL import Image
 from event.models import Event
@@ -97,6 +98,32 @@ class BookingLine(models.Model):
     verbose_name = "Ligne de réservation"
     verbose_name_plural = "Lignes de réservation"
   
+  @property
+  def buy_key(self) -> str:
+
+    """
+    Retourne la clé d'achat de la ligne de réservation.
+    Returns:
+      str: La clé d'achat de la ligne de réservation.
+    """
+    return str(self.id_booking_line)
+  
+  buy_key.fget.short_description = "Clé d'achat"
+
+  @property
+  def qr_code_thumbnail(self) -> str:
+
+    if self.qr_code_image:
+
+      return format_html(
+        f'''<a href="{self.qr_code_image.url}" onclick="window.open(this.href, '_blank', 'withdowName=popup'); return false;">'''
+          f'''<img src="{self.qr_code_image.url}" alt="QR code" width="80"/>'''
+        f'''</a>'''
+      )
+    return ''
+  
+  qr_code_thumbnail.fget.short_description = "QR Code (Vignette)"
+
   def save(self, *args, **kwargs) -> None:
 
     """

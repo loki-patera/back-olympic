@@ -24,6 +24,9 @@ urlpatterns = [
     # URL de l'interface l'administration moins évidente pour plus de sécurité
     path("co-entity/", admin.site.urls),
 
+    # URL de l'API pour les réservations
+    path('booking/', include('booking.urls')),
+
     # URL de l'API pour les événements
     path('event/', include('event.urls')),
 
