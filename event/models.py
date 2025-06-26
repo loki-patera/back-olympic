@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import Sum
 
 class Sport(models.Model):
 
@@ -137,8 +138,13 @@ class Event(models.Model):
     Returns:
       int : Le nombre de places disponibles, calculé en soustrayant le nombre de places réservées du nombre total de places.
     """
-    # booked_seats = self.booking_set.aggregate(Sum('offer__seats'))['offer__seats__sum'] or 0
-    booked_seats = 0                                      # Valeur à remplacer par la formule une fois le modèle Booking et Offer créés
+    from booking.models import BookingLine
+
+    # Calcule le nombre de places réservées pour l'événement
+    booked_seats = BookingLine.objects.filter(event=self).aggregate(
+      total=Sum('offer__number_seats')
+    )['total'] or 0
+    
     return self.location.total_seats - booked_seats
 
 
